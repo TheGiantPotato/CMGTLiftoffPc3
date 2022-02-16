@@ -5,7 +5,7 @@ using System.Text;
 using GXPEngine;
 class Tile : AnimationSprite
 {
-    public Tile(int tileID) : base("nethertileset.png", 5, 5)
+    public Tile(string tileSet, int tileSetWidth, int tileSetHeight, int tileID) : base(tileSet, tileSetWidth, tileSetHeight)
     {
         
         SetFrame(tileID);

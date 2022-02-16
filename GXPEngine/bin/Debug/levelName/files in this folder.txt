@@ -1,0 +1,9 @@
+This folder contains:
+
+A "parts" folder with all the parts of the level to choose from when going along the level.
+
+A "background" folder with all the background layers used in the level.
+
+A "start.tmx" file with the map of the part of the level you start the level in.
+
+A "spritesheet.tmx" file with the spritesheet of the parts of the level.

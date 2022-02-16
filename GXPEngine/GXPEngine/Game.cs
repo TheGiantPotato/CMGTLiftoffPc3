@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace GXPEngine
 {
+
 	/// <summary>
 	/// The Game class represents the Game window.
 	/// Only a single instance of this class is allowed.
@@ -17,6 +18,13 @@ namespace GXPEngine
 
 		private UpdateManager _updateManager;
 		private CollisionManager _collisionManager;
+
+
+		public float frameTime = 10;
+		public float frameRate = 100;
+		public float targetFrameRate;
+		public SoundManager soundManager;
+		
 
 		/// <summary>
 		/// Step delegate defines the signature of a method used for step callbacks, see OnBeforeStep, OnAfterStep.
