@@ -8,12 +8,13 @@ public class MyGame : Game
 {
 	Level currentLevel;
 	string[] levelPaths = Directory.GetDirectories("levels");
-	public MyGame() : base(1600, 900, false)		// Create a window that's 800x600 and NOT fullscreen
+	public MyGame() : base(1366, 768, false)		// Create a window that's 800x600 and NOT fullscreen
 	{
 		currentLevel = new Level("levels\\lab");
 		AddChild(currentLevel);
 		targetFrameRate = 60;
 		game.soundManager = new SoundManager();
+		
 
 	}
 
@@ -38,10 +39,10 @@ public class MyGame : Game
 
 	void swapLevel()
     {
-		Player thisPlayer = currentLevel.player;
-		int randomLevel = Utils.Random(0, levelPaths.Length);
+		Player thisPlayer = currentLevel.player;	//store player to carry over to next level
+		int randomLevel = Utils.Random(0, levelPaths.Length);	//get new random level
 		if (randomLevel == levelPaths.Length) --randomLevel;
-		currentLevel.KillMe();
+		currentLevel.KillMe();	//yeet old level
 		currentLevel = new Level(levelPaths[randomLevel]);
 		thisPlayer.x = currentLevel.GetPlayerStartPos().x;
 		thisPlayer.y = currentLevel.GetPlayerStartPos().y;

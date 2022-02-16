@@ -9,13 +9,12 @@ using GXPEngine;
 
 class Level : GameObject
 {
-    List<Tile> levelTiles = new List<Tile>();
-    List<Tile> lateLevelTiles = new List<Tile>();
+    
     List<LevelPart> activeLevelParts = new List<LevelPart>();
-    int levelHeight;
+    List<Background> backGroundLayers = new List<Background>();
+
+    
     public float currentLevelXPos = 0;
-    int tileWidth = 32;
-    int tileHeight = 32;
     public int tempXVelocity = 250;
     string levelPath;
     string[] levelParts;
@@ -28,22 +27,70 @@ class Level : GameObject
     public Level(string levelPath)
     {
         this.levelPath = levelPath;
+        SetupBackgrounds();
         activeLevelParts.Add(new LevelPart(levelPath, 0, true));
         AddChild(activeLevelParts[0]);
         currentLevelXPos += activeLevelParts[0].GetWidth();
-        levelParts = Directory.GetDirectories(levelPath + "\\parts");
+        levelParts = Directory.GetFiles(levelPath + "\\parts");
         while (currentLevelXPos < game.width)
         {
             AddNewLevelPart();
         }
+        player = activeLevelParts[0].FindObjectOfType<Player>();
+        CreateHUD(player);
+        Shooter[] shooters = activeLevelParts[0].FindObjectsOfType<Shooter>();
+        {
+            foreach (Shooter s in shooters)
+            {
+                s.target = player;
+            }
+        }
 
         SetupPlayer();
-
+    }
+    void CreateHUD(Player pTarget)
+    {
+        if (player == null) return; //if player is null then don't excecute what's underneath
+        game.LateAddChild(new HUD(pTarget));
     }
 
     public Vector GetPlayerStartPos()
     {
         return playerStartPos;
+    }
+
+    void SetupBackgrounds()
+    {
+        string[] backgroundImages = Directory.GetFiles(levelPath + "\\background");
+        string[] partBackgroundLocations = Directory.GetDirectories(levelPath + "\\background");
+        float parallaxValue = 0.8f;
+        float thisBackgroundMovementSpeed = parallaxValue;
+        for (int i = 0; i < backgroundImages.Length + partBackgroundLocations.Length; ++i)
+        {
+            thisBackgroundMovementSpeed *= parallaxValue;
+        }
+        foreach (string thisBackgroundImage in backgroundImages)
+        {
+            Background thisBackground = new Background(thisBackgroundImage, thisBackgroundMovementSpeed);
+            backGroundLayers.Add(thisBackground);
+            AddChild(thisBackground);
+            thisBackgroundMovementSpeed *= 1 / parallaxValue;
+        }
+        foreach (string thisPartBackgroundLocation in partBackgroundLocations)
+        {
+            Background thisPartBackground = new PartBackground(thisPartBackgroundLocation, thisBackgroundMovementSpeed);
+            backGroundLayers.Add(thisPartBackground);
+            AddChild(thisPartBackground);
+            thisBackgroundMovementSpeed *= 1 / parallaxValue;
+        }
+    }
+
+    void moveBackgrounds(float distanceToMove)
+    {
+        foreach(Background thisBackground in backGroundLayers)
+        {
+            thisBackground.DoRelativeMovement(distanceToMove);
+        }
     }
 
 
@@ -66,16 +113,12 @@ class Level : GameObject
             activeLevelParts.Remove(activeLevelParts[0]); 
         }
         Console.SetCursorPosition(0, 0);
-        Console.WriteLine(activeLevelParts.Count);
-        foreach(LevelPart thisPart in activeLevelParts)
-        {
-            Console.WriteLine(thisPart.x + "\n" + thisPart.GetChildren().Count() + "\n");
-
-        }
+        
         if (Input.GetKey(Key.T))
         {
             game.soundManager.PlaySound(shootSound, "level");
         }
+        moveBackgrounds(distToMove);
     }
 
     void AddNewLevelPart()
@@ -100,6 +143,10 @@ class Level : GameObject
         foreach(LevelPart thisPart in activeLevelParts)
         {
             thisPart.KillMe();
+        }
+        foreach(Background thisBackground in backGroundLayers)
+        {
+            thisBackground.KillMe();
         }
         this.Destroy();
     }

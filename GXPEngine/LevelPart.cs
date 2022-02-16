@@ -15,9 +15,29 @@ class LevelPart : GameObject
     int tileHeight;
     string spriteSheet;
     List<Tile> tiles = new List<Tile>();
+    TiledLoader levelIGuess;
 
 
     public LevelPart(String levelPartLocation, float startX, bool isStartOfLevel = false)
+    {
+        if (!isStartOfLevel) levelIGuess = new TiledLoader(levelPartLocation);
+        else levelIGuess = new TiledLoader(levelPartLocation + "\\start.tmx");
+
+        levelIGuess.rootObject = this;
+
+        levelIGuess.addColliders = true;
+        levelIGuess.LoadTileLayers();
+
+        levelIGuess.autoInstance = true;
+        levelIGuess.LoadObjectGroups();
+
+        //pixelWidth = levelPartMap.TileWidth * parsedTiles.GetLength(0);
+        pixelWidth = levelIGuess.map.TileWidth * levelIGuess.map.Width;
+
+    }
+
+    /*
+    public LevelPart(String levelPartLocation, string spriteSheetLocation, float startX, bool isStartOfLevel = false)
     {
         spriteSheet = levelPartLocation + "\\spritesheet.png";
         if (isStartOfLevel == false) levelPartMap = MapParser.ReadMap(levelPartLocation + "\\map.tmx");
@@ -25,7 +45,7 @@ class LevelPart : GameObject
         x = startX;
         BuildTiles();
     }
-
+    */
 
     void BuildTiles()
     {
